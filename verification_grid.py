@@ -23,8 +23,8 @@ def create_verification_grid_image(custom_name):
     grid_width = len(verification_grid[0]) * cell_size
     grid_height = len(verification_grid) * cell_size + header_height
 
-    # Create a blank image with white background
-    img = Image.new('RGB', (grid_width, grid_height), 'white')
+    # Create a blank image with white background in "1" mode (1-bit black and white)
+    img = Image.new('1', (grid_width, grid_height), 1)  # '1' mode for black/white
     draw = ImageDraw.Draw(img)
 
     # Load fonts with adjusted sizes
@@ -38,7 +38,7 @@ def create_verification_grid_image(custom_name):
     # Draw the title
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     title_text = f"Gen: {timestamp}\n{custom_name}"
-    draw.text((5, 5), title_text, fill="black", font=title_font)
+    draw.text((5, 5), title_text, fill=0, font=title_font)  # Fill=0 for black text
 
     # Draw the grid
     for i, row in enumerate(verification_grid):
@@ -47,18 +47,18 @@ def create_verification_grid_image(custom_name):
             y = i * cell_size + header_height
 
             # Draw cell border
-            draw.rectangle([x, y, x + cell_size, y + cell_size], outline="black", width=1)
+            draw.rectangle([x, y, x + cell_size, y + cell_size], outline=0, width=1)  # Outline=0 for black
 
             # Center the text in the cell
             bbox = draw.textbbox((0, 0), cell, font=font)
             text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             text_x = x + (cell_size - text_width) // 2
             text_y = y + (cell_size - text_height) // 2
-            draw.text((text_x, text_y), cell, fill="black", font=font)
+            draw.text((text_x, text_y), cell, fill=0, font=font)  # Fill=0 for black text
 
-    # Save the image to a file with higher compression
-    output_filename = f"verification_grid_{custom_name}.jpg"
-    img.save(output_filename, format='JPEG', quality=80, optimize=True)
+    # Save the image as PNG to preserve black/white and optimize file size
+    output_filename = f"verification_grid_{custom_name}.png"
+    img.save(output_filename, optimize=True)
     return output_filename
 
 # Example usage
